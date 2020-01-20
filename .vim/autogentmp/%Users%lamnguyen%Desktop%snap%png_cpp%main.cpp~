@@ -1,0 +1,198 @@
+#include <bits/stdc++.h>
+#include <vector>
+
+using namespace std;
+
+const char PNG_HEADER[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+
+unsigned int consumeBytes(vector<unsigned char> &raw, const unsigned short count);
+unsigned int consumeBytes(deque<unsigned char> &raw, const unsigned short count);
+
+class Image
+{
+	unsigned int _width;
+	unsigned int _height;
+	unsigned int _depth;
+	unsigned int _color_type;
+	unsigned int _compression_m;
+	unsigned int _filter_m;
+	unsigned int _interlace_m;
+	deque<unsigned char> _image_data;
+public:
+	static bool legit(FILE* png)
+	{
+		char c;
+		for (int i=0; i<8; ++i)
+		{
+			fscanf(png, "%c", &c);
+			printf(" %02x", c);
+			if (c != PNG_HEADER[i])
+			{
+				printf("Invalid PNG Header!");
+				//return 0;
+			}
+		}
+		printf("\n");
+		return 1;
+	}
+
+	Image() {}
+	Image(deque<unsigned char> &ihdr)
+	{
+		_width = consumeBytes(ihdr, 4);
+		_height = consumeBytes(ihdr, 4);
+		_depth = consumeBytes(ihdr, 1);
+		_color_type = consumeBytes(ihdr, 1);
+		_compression_m = consumeBytes(ihdr, 1);
+		_filter_m = consumeBytes(ihdr, 1);
+		_interlace_m = consumeBytes(ihdr, 1);
+	}
+	
+	// TODO: write these
+	void dataIn(vector<unsigned char>);
+	void dataIn(deque<unsigned char>);
+};
+
+bool legitPng(FILE* png)
+{ /* !DEPRECATED */
+	char c;
+	for (int i=0; i<8; ++i)
+	{
+		fscanf(png, "%c", &c);
+		if  (c != PNG_HEADER[i])
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
+deque<unsigned char>& pumpBytes(FILE* f, deque<unsigned char> &dest, const int bytes)
+{
+	//if (bytes > 8) throw "Too many bytes!";
+	char c; 
+	for  (int i=0; i<bytes; ++i)
+	{
+		fscanf(f, "%c", &c);
+		dest.push_back(c);
+	}
+	return dest;
+}
+
+unsigned int consumeBytes(deque<unsigned char> &raw, const unsigned short count)
+{
+	if (count > 4) throw "Too many bytes!";
+	if  (count > raw.size()) throw "Out of range!";
+	unsigned int data = 0;
+	for (unsigned short i=0; i<count; ++i);
+	{
+		data <<= 8;
+		data +=  raw.front();
+		raw.pop_front();
+	}
+}
+/*
+unsigned int consumeBytes(vector<unsigned char> &raw, const unsigned short count)
+{ /* !DEPRECATED * /
+	if (count > 4) throw "Too many bytes!";
+	if (count > raw.size()) throw "Out of range!";
+	unsigned int data = 0;
+	for (unsigned short i=0; i<count; ++i)
+	{
+		data <<= 8;
+		data += raw[i];
+		// TODO:  also pop from front of vector  
+	}
+	return data;
+}
+*/
+
+unsigned int getFourBytes(FILE* f)
+{
+	deque<unsigned char> q;
+	pumpBytes(f, q, 4);
+	for (const unsigned char &b : q) printf("  byte: %02x\n", b);
+	return consumeBytes(q, 4);
+}
+
+FILE* parseChunk(FILE* png, char* chunk_type, deque<unsigned char> &data)
+{
+	printf("parsing...\n");
+	unsigned char c;
+	// get length of chunk
+	unsigned int length = getFourBytes(png);
+	// get type of chunk
+	fscanf(png, "%4s", chunk_type);
+
+	//printf("Length of chunk: %d\n", length);
+	//printf("Chunk type: %s\n", chunk_type);
+
+	// get data
+	for (int i=0; i<length; ++i)
+	{
+		fscanf(png, "%c", &c);
+		data.push_back(c);
+	}
+	// get checksum
+	unsigned int check = getFourBytes(png);
+	// TODO: parse data and check with checksum.
+	printf("Length: %d\nType: %s\nChecksum: %08x\n", length, chunk_type, check);
+	return png;
+}
+void parseChunk(FILE* png, char* chunk_type, vector<unsigned char> &data)
+{ /* !DEPRECATED */
+	unsigned char c;
+	// get length of chunk
+	unsigned int length = getFourBytes(png);
+	// get type of chunk
+	fscanf(png, "%4s", chunk_type);
+
+	//printf("Length of chunk: %d\n", length);
+	//printf("Chunk type: %s\n", chunk_type);
+
+	// get data
+	for (int i=0; i<length; ++i)
+	{
+		fscanf(png, "%c", &c);
+		data.push_back(c);
+	}
+	// get checksum
+	unsigned int check = getFourBytes(png);
+	// TODO: parse data and check with checksum.
+}
+
+int main()
+{
+	FILE *png = fopen("test.png", "rb");
+	
+	if (! Image::legit(png))
+	{
+		printf("Invalid PNG header!\n");
+		return 1;
+	}
+
+	Image img;
+
+	char chunk_type[6] = {'N', 'U', 'L', 'L'};
+	int chunk_count = 0;
+	for (; strcmp(chunk_type, "IEND") != 0; ++ chunk_count)
+	{
+		printf("Just got chunk %s\n", chunk_type);
+		deque<unsigned char> chunk_data;
+		png = parseChunk(png, chunk_type, chunk_data);
+
+		if (strcmp(chunk_type, "IHDR") == 0)
+		{
+			img = Image(chunk_data);
+		}
+		else if (strcmp(chunk_type, "IDAT") == 0)
+		{
+			printf("image data:\n");
+			for (const unsigned char &c : chunk_data)
+			{
+				printf(" %02x", c);
+			}
+		}
+	}
+	return 0;
+}

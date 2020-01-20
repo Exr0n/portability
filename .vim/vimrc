@@ -1,0 +1,59 @@
+set number
+
+" from jack liu
+
+syntax on
+colorscheme desert
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'scrooloose/nerdtree'
+" auto quit if nerdtree is the only open window
+autocmd vimenter * NERDTree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" auto start on the correct window (not nerdtree)
+autocmd vimenter * wincmd l
+
+"map cn to NERDTreeToggle
+map <C-n> :NERDTreeToggle<CR>
+
+
+" set up YouCompleteMe, which is apparently a pain (jack doesn't want to teach me)
+" also UltiSnips
+
+call plug#end()
+
+" TODO: this doesn't work??
+highlight Comment cterm=italic
+
+" My Customs
+" " CUSTOM: change backup dir https://stackoverflow.com/a/1625850/10372825
+set backupdir=~/.vim/autogentmp//,.
+set directory=~/.vim/autogentmp//,.
+set undodir=~/.vim/autogentmp//,~/.vim/autogentmp/undo//,.
+
+" from https://www.linode.com/docs/tools-reference/tools/introduction-to-vim-customization/
+syntax on " turn on sytax highlighting
+set ttyfast " speed up scrolling
+set number " line numbers
+set scrolloff=5 " display 8 lines above and below cursor at all times
+set matchpairs+=<:>
+
+" set search stuff
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+" tab sizing
+set tabstop=2
+set shiftwidth=2
+set noexpandtab
+
+" code folding: https://codeyarns.com/2014/09/02/how-to-fold-code-in-vim/
+set foldmethod=indent
+set foldlevel=3
+set nofoldenable
+
+" cursor stuff
+set mouse=a
