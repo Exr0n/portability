@@ -3,7 +3,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/$USER/.oh-my-zsh"
+export ZSH="/Users/lamnguyen/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -117,10 +117,10 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #VIRTUAL_ENV_DISABLE_PROMPT='' source '/Users/lamnguyen/Library/Enthought/Canopy_64bit/User/bin/activate'
 
 # added by Anaconda3 4.0.0 installer
-export PATH="/Users/$USER/anaconda/bin:$PATH"
+export PATH="/Users/lamnguyen/anaconda/bin:$PATH"
 
 # added by Anaconda3 5.0.1 installer
-export PATH="/Users/$USER/anaconda3/bin:$PATH"
+export PATH="/Users/lamnguyen/anaconda3/bin:$PATH"
 
 # Setting PATH for Python 3.7
 # The original version is saved in .bash_profile.pysave
@@ -128,7 +128,7 @@ PATH="/Library/Frameworks/Python.framework/Versions/3.7/bin:${PATH}"
 export PATH
 
 # Zsh Completions (https://medium.com/@beatrizmrg/gaining-efficiency-with-iterm-prompt-customization-on-macos-3ad212f5bfde)
-# fpath=(/usr/local/share/zsh-completions $fpath)
+# shouldn't need this with zsh-autosuggest # fpath=(/usr/local/share/zsh-completions $fpath)
 
 # Custom Aliases
 alias tsn='ts-node'
@@ -136,6 +136,6 @@ alias trf='ssh exr0n@hop.exr0n.com -p 2222'
 #    Alias to auto open files with vim
 alias -s {txt,md,cpp,rs,py,properties,yml,yaml}=vim
 
-# "Advanced Tab Completion" from https://opensource.com/article/18/9/tips-productivity-zsh
-autoload -U compinit
-compinit
+# "Advanced Tab Completion" from https://opensource.com/article/18/9/tips-productivity-zsh - removed because it's super slow
+# autoload -U compinit
+# compinit
